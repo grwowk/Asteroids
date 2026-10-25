@@ -1,4 +1,5 @@
 import pygame
+import sys
 from pygame.time import Clock
 
 import circleshape
@@ -6,7 +7,7 @@ import player
 import asteroid
 import asteroidfield
 from constants import LINE_WIDTH, PLAYER_RADIUS, SCREEN_HEIGHT, SCREEN_WIDTH
-from logger import log_state
+from logger import log_state, log_event
 
 
 def main():
@@ -45,6 +46,11 @@ def main():
         # update loop
         for thing in updatable:
             thing.update(dt)
+            if isinstance (thing, asteroid.Asteroid):
+                if ship.collides_with(thing):
+                    log_event("player_hit")
+                    print("Game Over!")
+                    sys.exit()
         for thing in drawable:
             thing.draw(screen)
 
