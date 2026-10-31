@@ -1,13 +1,17 @@
+from turtle import position
+
 import pygame
 
 import circleshape
 import constants
+import shot
 
 
 class Player(circleshape.CircleShape):
     def __init__(self, x: float, y: float) -> None:
         super().__init__(x, y, constants.PLAYER_RADIUS)
         self.rotation = 0
+        self.shoot_timer = constants.PLAYER_SHOOT_COOLDOWN_SECONDS
 
     def triangle(self) -> list[pygame.Vector2]:
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -29,6 +33,15 @@ class Player(circleshape.CircleShape):
         rotated_with_speed_vector = rotated_vector * constants.PLAYER_SPEED * dt
         self.position += rotated_with_speed_vector
 
+    def shoot (self,timer):
+        self.shoot_timer -= timer
+        if self.shoot_timer > 0:
+            return
+        bullet = shot.Shot(self.position[0], self.position[1])
+        bullet.velocity = pygame.Vector2(0,1).rotate(self.rotation) * constants.PLAYER_SHOOT_SPEED
+        self.shoot_timer = constants.PLAYER_SHOOT_COOLDOWN_SECONDS
+
+
     def update(self, dt: float) -> None:
         keys = pygame.key.get_pressed()
 
@@ -40,3 +53,5 @@ class Player(circleshape.CircleShape):
             self.move(dt)
         if keys[pygame.K_s]:
             self.move(-dt)
+        if keys[pygame.K_SPACE]:
+            self.shoot(dt)
